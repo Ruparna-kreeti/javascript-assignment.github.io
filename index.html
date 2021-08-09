@@ -16,7 +16,7 @@
     <div class="mainContainer">
         <section class="container addUsers">
             <h2>Input Users</h2>
-            <form action="" onsubmit="event.preventDefault(); AddUser();">
+            <form action="" onsubmit="addUser(event)">
                 <table>
                     <tr>
                         <td>
@@ -39,7 +39,7 @@
                             <label for="dob">Date of birth:</label>
                         </td>
                         <td>
-                            <input type="date" name="dob" id="dob" onchange="AddAgeInForm()" required>
+                            <input type="date" name="dob" id="dob" onchange="addAgeInForm()" required>
                         </td>
                     </tr>
                     <tr>
@@ -121,7 +121,7 @@
         -->
         <section class="container searchUser">
             <h2>Search Users</h2>
-            <form action="" onsubmit="event.preventDefault(); searchUser()">
+            <form action="" onsubmit="searchUser(event)">
                 <label for="search-email">Search user by email</label>
                 <input type="text" id="search-email">
                 <button type="submit">Search</button>
@@ -148,7 +148,7 @@
             <h2>Search Github Dp</h2>
             <img src="" alt="your image will be loaded here" id="github-dp">
             <p id="fail-message"></p>
-            <form action="" onsubmit="event.preventDefault();" id="sform">
+            <form action="" onsubmit="getGithubDp(event)" id="sform">
                 <label for="username">Enter Username:</label>
                 <input type="text" name="search" id="username">
                 <button type="submit">Search</button>

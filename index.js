@@ -9,11 +9,11 @@
   A table where we can see the users and can delete them
   Search user by email where the user can be searched
   User status which shows total users,male users,female users
-  Checking github dp by username which is built with jquery
+  Checking github dp by username using fetch and promises which also shows error message when given wrong user name
   -------------------------------------------------------------------------------------------------- */
 
 /* this variable stores the user datas */
-var users = [
+let users = [
   {
     id: 1,
     firstName: "John",
@@ -27,8 +27,8 @@ var users = [
 ];
 
 /*add the existing users to the table when loading window */
-window.onload = function setTable() {
-  var table = "";
+window.onload = () => {
+  let table = "";
 
   users.forEach((user) => {
     table += `<tr id="row${user.id}">`;
@@ -48,26 +48,27 @@ window.onload = function setTable() {
 };
 
 /*This function adds the age when date is given in the form */
-function AddAgeInForm(event) {
-  var dob = document.getElementById("dob").value;
-  var age = AgeCalculation(dob);
+const addAgeInForm = (event) => {
+  let dob = document.getElementById("dob").value;
+  let age = ageCalculation(dob);
   document.getElementById("answer-for-age").innerHTML = age;
-}
+};
 
 /*This function adds user to users variable */
-function AddUser() {
+const addUser = (event) => {
+  event.preventDefault();
   //taking values from form element
-  var id = users.length + 1;
-  var firstName = document.getElementById("fname").value;
-  var lastName = document.getElementById("lname").value;
-  var dob = document.getElementById("dob").value;
-  var age = AgeCalculation(dob);
-  var gender = document.querySelector('input[name="gender"]:checked').value;
-  var bloodGroup = document.getElementById("blood-group").value;
-  var email = document.getElementById("email").value;
+  let id = users.length + 1;
+  let firstName = document.getElementById("fname").value;
+  let lastName = document.getElementById("lname").value;
+  let dob = document.getElementById("dob").value;
+  let age = ageCalculation(dob);
+  let gender = document.querySelector('input[name="gender"]:checked').value;
+  let bloodGroup = document.getElementById("blood-group").value;
+  let email = document.getElementById("email").value;
 
   //if values are valid,then pushed to users variable and append them to table
-  if (UserValidation(firstName, lastName, age, email)) {
+  if (userValidation(firstName, lastName, age, email)) {
     users.push({
       id: id,
       firstName: firstName,
@@ -78,7 +79,7 @@ function AddUser() {
       bloodGroup: bloodGroup,
       email: email,
     });
-    var table = "";
+    let table = "";
     table += `<tr id="row${id}">`;
     table += `<td>${id}</td>`;
     table += `<td>${firstName}</td>`;
@@ -95,16 +96,16 @@ function AddUser() {
       .insertAdjacentHTML("beforeend", table);
   }
   status();
-}
+};
 
 /*This function calculates age from date of birth */
-function AgeCalculation(dob) {
+const ageCalculation = (dob) => {
   return new Date(Date.now()).getFullYear() - new Date(dob).getFullYear();
-}
+};
 
 /*This function validates the inputs given by the user */
-function UserValidation(firstName, lastName, age, email) {
-  var name_regex = /^[a-zA-Z]{3,}$/;
+const userValidation = (firstName, lastName, age, email) => {
+  let name_regex = /^[a-zA-Z]{3,}$/;
   if (!(name_regex.test(firstName) && name_regex.test(lastName))) {
     alert("Check your name");
     return false;
@@ -113,17 +114,18 @@ function UserValidation(firstName, lastName, age, email) {
     alert("Age must be atleast 18");
     return false;
   }
-  var exists = users.some((user) => user.email == email);
+  let exists = users.some((user) => user.email == email);
   if (exists) {
     alert("email exists");
     return false;
   }
   return true;
-}
+};
 
 /*This function searches the user by name */
-function searchUser() {
-  var email = document.getElementById("search-email").value;
+const searchUser = (event) => {
+  event.preventDefault();
+  let email = document.getElementById("search-email").value;
   user = users.find(function (user, index) {
     if (user.email == email) return user;
   });
@@ -138,18 +140,18 @@ function searchUser() {
   document.getElementById(
     "searched-dob"
   ).innerHTML = `Blood-Group:${user.bloodGroup}`;
-}
+};
 
 /*This function deletes users */
-function deleteRow(e) {
+const deleteRow = (e) => {
   users = users.filter((user) => user.id !== e);
   document.getElementById("row" + e).remove();
   status();
-}
+};
 
 /*This function givees the status of the users */
-function status() {
-  var totalUsers = users.length,
+const status = () => {
+  let totalUsers = users.length,
     maleUsers = 0,
     femaleUsers = 0;
   users.forEach(function (user) {
@@ -162,17 +164,41 @@ function status() {
   document.getElementById(
     "female-users"
   ).innerHTML = `Female users:${femaleUsers}`;
-}
+};
 
-/* Using jquery to get output */
+/* **************************************************************************************
+Using jquery to get output 
 
-/* This Jquery function accepts the username and adds src attribute of github dp to the image */
+ This Jquery function accepts the username and adds src attribute of github dp to the image 
 $(document).ready(function (e) {
   $("#github-dp").hide();
   $("#sform").on("submit", function () {
-    var userName = $("#username").val();
+    let userName = $("#username").val();
     $.get(`https://api.github.com/users/${userName}`, function (data) {
       $("#github-dp").attr("src", `${data.avatar_url}`);
     }).done($("#github-dp").show());
   });
 });
+*****************************************************************************************/
+
+/*Get dp of github from this function */
+const getGithubDp = (event) => {
+  event.preventDefault();
+  let userName = document.getElementById("username").value;
+  fetch(`https://api.github.com/users/${userName}`)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Username not available");
+      }
+    })
+    .then((response) => {
+      document.getElementById("github-dp").src = response.avatar_url;
+      document.getElementById("fail-message").innerHTML = "";
+    })
+    .catch((error) => {
+      document.getElementById("fail-message").innerHTML = error;
+      document.getElementById("github-dp").src = "";
+    });
+};
